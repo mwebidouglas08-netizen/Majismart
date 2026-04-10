@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const path = require('path');
-const cron = require('node-cron');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,18 +14,16 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
 app.use(morgan('combined'));
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    'http://localhost:3000',
-    'http://localhost:5000'
-  ],
+  origin: '*',
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// ─── Database ──────────────────────────────────────────────────────────────────
-const db = require('./db');
+// ─── Health check FIRST — before DB, before anything ──────────────────────────
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', version: '1.0.0', time: new Date().toISOString() });
+});
 
 // ─── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth',      require('./routes/auth'));
@@ -37,65 +34,66 @@ app.use('/api/alerts',    require('./routes/alerts'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/users',     require('./routes/users'));
 
-// ─── Health check ──────────────────────────────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', version: '1.0.0', time: new Date().toISOString() });
-});
-
 // ─── Serve frontend in production ──────────────────────────────────────────────
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-  });
-}
-
-// ─── Cron: simulate sensor readings every 2 minutes (demo) ────────────────────
-cron.schedule('*/2 * * * *', async () => {
-  try {
-    const { rows: nodes } = await db.query(`SELECT id FROM nodes WHERE status='active'`);
-    for (const node of nodes) {
-      const level = Math.floor(50 + Math.random() * 50);
-      const flow  = parseFloat((2 + Math.random() * 8).toFixed(2));
-      const turb  = parseFloat((0.5 + Math.random() * 3).toFixed(2));
-      const temp  = parseFloat((18 + Math.random() * 10).toFixed(1));
-      await db.query(
-        `INSERT INTO sensor_readings (node_id, water_level, flow_rate, turbidity, temperature)
-         VALUES ($1,$2,$3,$4,$5)`,
-        [node.id, level, flow, turb, temp]
-      );
-      // trigger alert if low
-      if (level < 20) {
-        await db.query(
-          `INSERT INTO alerts (node_id, type, message, severity)
-           VALUES ($1,'low_water','Tank level critically low: '||$2||'%','critical')
-           ON CONFLICT DO NOTHING`,
-          [node.id, level]
-        );
-        await db.query(`UPDATE nodes SET status='warning' WHERE id=$1`, [node.id]);
-      }
-    }
-  } catch (err) {
-    // silent in production
-  }
+const frontendDist = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendDist));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'));
 });
 
 // ─── Error handler ─────────────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal server error'
-  });
+  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
 });
 
-// ─── Start ─────────────────────────────────────────────────────────────────────
-db.initSchema().then(() => {
-  app.listen(PORT, () => {
-    console.log(`✅ MajiSmart API running on port ${PORT}`);
-  });
-}).catch(err => {
-  console.error('DB init failed:', err);
-  process.exit(1);
+// ─── Start server FIRST, then init DB ─────────────────────────────────────────
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ MajiSmart API running on port ${PORT}`);
 });
+
+// Init DB and cron AFTER server is already listening
+const db = require('./db');
+db.initSchema()
+  .then(() => {
+    console.log('✅ Database ready');
+    startCron();
+  })
+  .catch(err => {
+    console.error('⚠️  DB init failed (server still running):', err.message);
+    // Do NOT exit — health check must stay alive so Railway doesn't kill the container
+  });
+
+function startCron() {
+  try {
+    const cron = require('node-cron');
+    cron.schedule('*/2 * * * *', async () => {
+      try {
+        const { rows: nodes } = await db.query(`SELECT id FROM nodes WHERE status='active' LIMIT 20`);
+        for (const node of nodes) {
+          const level = Math.floor(40 + Math.random() * 55);
+          const flow  = parseFloat((2 + Math.random() * 8).toFixed(2));
+          const turb  = parseFloat((0.3 + Math.random() * 3).toFixed(2));
+          const temp  = parseFloat((18 + Math.random() * 10).toFixed(1));
+          await db.query(
+            `INSERT INTO sensor_readings (node_id, water_level, flow_rate, turbidity, temperature)
+             VALUES ($1,$2,$3,$4,$5)`,
+            [node.id, level, flow, turb, temp]
+          );
+          if (level < 20) {
+            await db.query(
+              `INSERT INTO alerts (node_id, type, message, severity)
+               VALUES ($1,'low_water','Tank level critically low: '||$2||'%','critical')`,
+              [node.id, level]
+            );
+          }
+        }
+      } catch (e) { /* silent */ }
+    });
+    console.log('✅ Cron jobs started');
+  } catch (e) {
+    console.error('Cron init error:', e.message);
+  }
+}
 
 module.exports = app;
