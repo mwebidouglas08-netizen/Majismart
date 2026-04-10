@@ -1,29 +1,35 @@
 const { Pool } = require('pg');
 
+if (!process.env.DATABASE_URL) {
+  console.warn('⚠️  DATABASE_URL not set — database features will fail');
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 20,
+  max: 10,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 5000,
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected DB error', err);
+  console.error('Unexpected DB pool error:', err.message);
 });
 
 async function query(text, params) {
-  const start = Date.now();
-  const res = await pool.query(text, params);
-  const duration = Date.now() - start;
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('query', { text: text.substring(0,60), duration, rows: res.rowCount });
+  const client = await pool.connect();
+  try {
+    const res = await client.query(text, params);
+    return res;
+  } finally {
+    client.release();
   }
-  return res;
 }
 
 async function initSchema() {
   await pool.query(`
+    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
     CREATE TABLE IF NOT EXISTS users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(100) NOT NULL,
@@ -102,49 +108,47 @@ async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_alerts_resolved ON alerts(resolved);
   `);
 
-  // Seed demo data if empty
   const { rows } = await pool.query('SELECT COUNT(*) FROM nodes');
   if (parseInt(rows[0].count) === 0) {
     await seedDemo();
   }
-  console.log('✅ Database schema ready');
 }
 
 async function seedDemo() {
-  // Demo admin user
+  console.log('🌱 Seeding demo data…');
   const bcrypt = require('bcryptjs');
   const hash = await bcrypt.hash('admin123', 10);
+
   await pool.query(`
     INSERT INTO users (name, email, password, role, county) VALUES
-    ('Admin User', 'admin@majismart.ke', $1, 'admin', 'Nairobi'),
-    ('Jane Wanjiku', 'county@majismart.ke', $1, 'county_officer', 'Kiambu'),
-    ('John Kamau', 'operator@majismart.ke', $1, 'operator', 'Machakos')
-    ON CONFLICT DO NOTHING
+    ('Admin User',   'admin@majismart.ke',    $1, 'admin',          'Nairobi'),
+    ('Jane Wanjiku', 'county@majismart.ke',   $1, 'county_officer', 'Kiambu'),
+    ('John Kamau',   'operator@majismart.ke', $1, 'operator',       'Machakos')
+    ON CONFLICT (email) DO NOTHING
   `, [hash]);
 
-  // Demo nodes
   await pool.query(`
     INSERT INTO nodes (name, location, county, latitude, longitude, status, type, capacity_litres) VALUES
-    ('Kiambu Borehole 1','Thika Road, Kiambu','Kiambu',-1.0332,36.8279,'active','borehole',15000),
-    ('Machakos Tank A','Machakos Town Centre','Machakos',-1.5177,37.2634,'active','tank',10000),
-    ('Kibera Water Kiosk','Olympic Estate, Kibera','Nairobi',-1.3133,36.7887,'warning','kiosk',5000),
-    ('Nakuru Borehole 3','Nakuru Industrial Area','Nakuru',-0.3031,36.0800,'active','borehole',20000),
-    ('Mombasa Tank B','Kisauni, Mombasa','Mombasa',-3.9930,39.7193,'active','tank',8000),
-    ('Kisumu Intake','Winam Gulf, Kisumu','Kisumu',-0.1022,34.7617,'offline','river_intake',25000)
+    ('Kiambu Borehole 1',  'Thika Road, Kiambu',     'Kiambu',   -1.0332, 36.8279, 'active',  'borehole',     15000),
+    ('Machakos Tank A',    'Machakos Town Centre',    'Machakos', -1.5177, 37.2634, 'active',  'tank',         10000),
+    ('Kibera Water Kiosk', 'Olympic Estate, Kibera',  'Nairobi',  -1.3133, 36.7887, 'warning', 'kiosk',         5000),
+    ('Nakuru Borehole 3',  'Nakuru Industrial Area',  'Nakuru',   -0.3031, 36.0800, 'active',  'borehole',     20000),
+    ('Mombasa Tank B',     'Kisauni, Mombasa',        'Mombasa',  -3.9930, 39.7193, 'active',  'tank',          8000),
+    ('Kisumu Intake',      'Winam Gulf, Kisumu',      'Kisumu',   -0.1022, 34.7617, 'offline', 'river_intake', 25000)
     ON CONFLICT DO NOTHING
   `);
 
-  // Seed historical sensor data (last 48 hours)
   const { rows: nodes } = await pool.query('SELECT id FROM nodes');
+
   for (const node of nodes) {
     for (let i = 48; i >= 0; i--) {
-      const t = new Date(Date.now() - i * 60 * 60 * 1000);
-      await pool.query(`
-        INSERT INTO sensor_readings (node_id, water_level, flow_rate, turbidity, temperature, recorded_at)
-        VALUES ($1,$2,$3,$4,$5,$6)`,
+      const t = new Date(Date.now() - i * 3600 * 1000);
+      await pool.query(
+        `INSERT INTO sensor_readings (node_id, water_level, flow_rate, turbidity, temperature, recorded_at)
+         VALUES ($1,$2,$3,$4,$5,$6)`,
         [
           node.id,
-          Math.floor(30 + Math.random() * 70),
+          Math.floor(30 + Math.random() * 65),
           parseFloat((1 + Math.random() * 10).toFixed(2)),
           parseFloat((0.3 + Math.random() * 4).toFixed(2)),
           parseFloat((17 + Math.random() * 12).toFixed(1)),
@@ -154,41 +158,44 @@ async function seedDemo() {
     }
   }
 
-  // Seed some payments
-  const nodeIds = nodes.map(n => n.id);
   const phones = ['0712345678','0723456789','0734567890','0745678901','0756789012'];
+  const nodeIds = nodes.map(n => n.id);
   for (let i = 0; i < 30; i++) {
-    const litres = [20,40,60,100][Math.floor(Math.random()*4)];
-    await pool.query(`
-      INSERT INTO payments (node_id, phone, amount_ksh, litres, mpesa_code, status, created_at)
-      VALUES ($1,$2,$3,$4,$5,'completed', NOW() - ($6 * interval '1 hour'))`,
+    const litres = [20, 40, 60, 100][Math.floor(Math.random() * 4)];
+    const hoursAgo = Math.floor(Math.random() * 72);
+    await pool.query(
+      `INSERT INTO payments (node_id, phone, amount_ksh, litres, mpesa_code, status, created_at, completed_at)
+       VALUES ($1,$2,$3,$4,$5,'completed',
+         NOW() - ($6 * interval '1 hour'),
+         NOW() - ($6 * interval '1 hour') + interval '30 seconds')`,
       [
-        nodeIds[Math.floor(Math.random()*nodeIds.length)],
-        phones[Math.floor(Math.random()*phones.length)],
+        nodeIds[Math.floor(Math.random() * nodeIds.length)],
+        phones[Math.floor(Math.random() * phones.length)],
         (litres * 0.1).toFixed(2),
         litres,
-        'QK' + Math.random().toString(36).substr(2,8).toUpperCase(),
-        Math.floor(Math.random() * 72)
+        'QK' + Math.random().toString(36).substr(2, 8).toUpperCase(),
+        hoursAgo
       ]
     );
   }
 
-  // Seed alerts
-  const alertTypes = [
-    {type:'low_water', msg:'Tank level below 20%', sev:'critical'},
-    {type:'high_turbidity', msg:'Turbidity exceeds WHO limit', sev:'warning'},
-    {type:'pump_failure', msg:'Flow rate dropped to zero', sev:'critical'},
-    {type:'maintenance_due', msg:'Scheduled maintenance overdue', sev:'info'}
+  const alertDefs = [
+    { type: 'low_water',       msg: 'Tank level below 20%',               sev: 'critical' },
+    { type: 'high_turbidity',  msg: 'Turbidity exceeds WHO limit (4 NTU)', sev: 'warning'  },
+    { type: 'pump_failure',    msg: 'Flow rate dropped to zero',           sev: 'critical' },
+    { type: 'maintenance_due', msg: 'Scheduled maintenance overdue',       sev: 'info'     },
   ];
   for (let i = 0; i < 8; i++) {
-    const a = alertTypes[Math.floor(Math.random()*alertTypes.length)];
-    await pool.query(`
-      INSERT INTO alerts (node_id, type, message, severity, resolved, created_at)
-      VALUES ($1,$2,$3,$4,$5, NOW() - ($6 * interval '1 hour'))`,
+    const a = alertDefs[Math.floor(Math.random() * alertDefs.length)];
+    const resolved = Math.random() > 0.5;
+    await pool.query(
+      `INSERT INTO alerts (node_id, type, message, severity, resolved, resolved_at, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6, NOW() - ($7 * interval '1 hour'))`,
       [
-        nodeIds[Math.floor(Math.random()*nodeIds.length)],
+        nodeIds[Math.floor(Math.random() * nodeIds.length)],
         a.type, a.msg, a.sev,
-        Math.random() > 0.5,
+        resolved,
+        resolved ? new Date() : null,
         Math.floor(Math.random() * 48)
       ]
     );
