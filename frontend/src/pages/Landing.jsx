@@ -8,7 +8,7 @@ export default function Landing() {
       {/* NAV */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: 'rgba(12,26,46,.95)', backdropFilter: 'blur(12px)',
+        background: 'rgba(8,17,30,.95)', backdropFilter: 'blur(12px)',
         padding: '0 32px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -28,18 +28,29 @@ export default function Landing() {
 
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-        {/* Full-screen water background */}
+
+        {/* HD background image — African water scarcity scene */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, #0c1a2e 0%, #0d3a6e 40%, #0a5c8a 70%, #0d9e75 100%)',
+          backgroundImage: `url('https://images.unsplash.com/photo-1541544537156-7627a7a4aa1c?w=1920&q=90&auto=format&fit=crop')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 30%',
+          backgroundRepeat: 'no-repeat',
         }} />
+
+        {/* Dark overlay so text stays readable */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, rgba(8,17,30,0.88) 0%, rgba(13,58,110,0.80) 45%, rgba(10,92,138,0.72) 70%, rgba(13,158,117,0.65) 100%)',
+        }} />
+
         {/* Animated water ripple effect */}
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
           {[1,2,3,4].map(i => (
             <div key={i} style={{
               position: 'absolute',
               borderRadius: '50%',
-              border: '1px solid rgba(26,127,212,.25)',
+              border: '1px solid rgba(77,208,168,.30)',
               animation: `ripple ${3+i}s ease-out infinite`,
               animationDelay: `${i*0.7}s`,
               width: `${200+i*180}px`, height: `${200+i*180}px`,
@@ -48,6 +59,7 @@ export default function Landing() {
             }} />
           ))}
         </div>
+
         <style>{`
           @keyframes ripple { 0%{opacity:.7;transform:translate(-50%,-50%) scale(0.8)} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)} }
           @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
@@ -56,14 +68,17 @@ export default function Landing() {
 
         {/* Decorative water drops */}
         <div style={{ position: 'absolute', top: '20%', right: '8%', animation: 'float 4s ease-in-out infinite' }}>
-          <Droplets size={80} color="rgba(13,158,117,.3)" />
+          <Droplets size={80} color="rgba(13,158,117,.35)" />
         </div>
         <div style={{ position: 'absolute', bottom: '25%', right: '15%', animation: 'float 5s ease-in-out infinite .5s' }}>
-          <Droplets size={48} color="rgba(26,127,212,.3)" />
+          <Droplets size={48} color="rgba(26,127,212,.35)" />
         </div>
 
+        {/* Hero content */}
         <div style={{ position: 'relative', zIndex: 2, padding: '120px 40px 80px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
           <div style={{ animation: 'fadeUp .8s ease forwards' }}>
+
+            {/* Live badge */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(13,158,117,.2)', border: '1px solid rgba(13,158,117,.4)', borderRadius: 99, padding: '6px 14px', marginBottom: 24 }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0d9e75', animation: 'ripple 1.5s ease-out infinite' }} />
               <span style={{ color: '#4dd0a8', fontSize: 13, fontWeight: 500 }}>Live — 6 Active Nodes Across Kenya</span>
@@ -76,7 +91,7 @@ export default function Landing() {
               </span>
             </h1>
 
-            <p style={{ fontSize: 18, color: 'rgba(255,255,255,.7)', maxWidth: 560, lineHeight: 1.75, marginBottom: 40 }}>
+            <p style={{ fontSize: 18, color: 'rgba(255,255,255,.75)', maxWidth: 560, lineHeight: 1.8, marginBottom: 40 }}>
               IoT sensors monitor boreholes and tanks in real time. Communities pay via M-Pesa. County officials get live data. No cash. No waste. No guesswork.
             </p>
 
@@ -104,10 +119,10 @@ export default function Landing() {
             {/* Stats row */}
             <div style={{ display: 'flex', gap: 40, marginTop: 64, flexWrap: 'wrap' }}>
               {[
-                { val: '41%', label: 'Kenyans lack safe water' },
+                { val: '41%',   label: 'Kenyans lack safe water' },
                 { val: 'Ksh 2', label: 'Per 20L via M-Pesa' },
-                { val: '6hrs', label: 'Saved daily per family' },
-                { val: '60%', label: 'Less water wastage' },
+                { val: '6hrs',  label: 'Saved daily per family' },
+                { val: '60%',   label: 'Less water wastage' },
               ].map(s => (
                 <div key={s.val}>
                   <div style={{ fontSize: 28, fontWeight: 800, color: 'white' }}>{s.val}</div>
@@ -115,6 +130,7 @@ export default function Landing() {
                 </div>
               ))}
             </div>
+
           </div>
         </div>
 
@@ -137,15 +153,15 @@ export default function Landing() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 24 }}>
             {[
-              { icon: Wifi,        color: '#1a7fd4', title: 'IoT Sensor Node',     desc: 'Solar-powered sensor reads water level, flow & turbidity every 15 minutes' },
-              { icon: Zap,         color: '#0d9e75', title: '2G Transmission',     desc: 'Data sent over Safaricom/Airtel 2G — works anywhere in Kenya' },
-              { icon: CreditCard,  color: '#e8a020', title: 'M-Pesa Payment',      desc: 'Dial USSD, confirm M-Pesa, solenoid valve opens for exact volume paid' },
-              { icon: Bell,        color: '#d93025', title: 'Smart Alerts',        desc: 'Instant SMS when tank is low, pump fails, or water quality drops' },
-              { icon: BarChart3,   color: '#6f42c1', title: 'County Dashboard',    desc: 'Live map, usage data, revenue reports for all county water points' },
+              { icon: Wifi,       color: '#1a7fd4', title: 'IoT Sensor Node',   desc: 'Solar-powered sensor reads water level, flow & turbidity every 15 minutes' },
+              { icon: Zap,        color: '#0d9e75', title: '2G Transmission',   desc: 'Data sent over Safaricom/Airtel 2G — works anywhere in Kenya' },
+              { icon: CreditCard, color: '#e8a020', title: 'M-Pesa Payment',    desc: 'Dial USSD, confirm M-Pesa, solenoid valve opens for exact volume paid' },
+              { icon: Bell,       color: '#d93025', title: 'Smart Alerts',      desc: 'Instant SMS when tank is low, pump fails, or water quality drops' },
+              { icon: BarChart3,  color: '#6f42c1', title: 'County Dashboard',  desc: 'Live map, usage data, revenue reports for all county water points' },
             ].map((s, i) => (
-              <div key={i} className="card" style={{ padding: 28, textAlign: 'left', transition: 'transform .2s,box-shadow .2s' }}
-                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='var(--shadow-md)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='var(--shadow-sm)' }}>
+              <div key={i} className="card" style={{ padding: 28, textAlign: 'left', transition: 'transform .2s,box-shadow .2s', cursor: 'default' }}
+                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='0 8px 32px rgba(0,0,0,.13)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='' }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, background: s.color+'18', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                   <s.icon size={22} color={s.color} />
                 </div>
@@ -196,10 +212,10 @@ export default function Landing() {
                 <span style={{ fontSize: 13, color: 'rgba(255,255,255,.6)' }}>Live Node Status</span>
               </div>
               {[
-                { name: 'Kiambu Borehole 1',  level: 78, status: 'active',  county: 'Kiambu' },
-                { name: 'Machakos Tank A',    level: 45, status: 'active',  county: 'Machakos' },
-                { name: 'Kibera Kiosk',       level: 18, status: 'warning', county: 'Nairobi' },
-                { name: 'Nakuru Borehole 3',  level: 91, status: 'active',  county: 'Nakuru' },
+                { name: 'Kiambu Borehole 1', level: 78, status: 'active',  county: 'Kiambu' },
+                { name: 'Machakos Tank A',   level: 45, status: 'active',  county: 'Machakos' },
+                { name: 'Kibera Kiosk',      level: 18, status: 'warning', county: 'Nairobi' },
+                { name: 'Nakuru Borehole 3', level: 91, status: 'active',  county: 'Nakuru' },
               ].map(n => (
                 <div key={n.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,.06)' }}>
                   <MapPin size={14} color="rgba(255,255,255,.4)" />
@@ -213,7 +229,11 @@ export default function Landing() {
                     </div>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,.5)', marginTop: 3 }}>{n.level}%</div>
                   </div>
-                  <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 99, background: n.status==='warning'?'rgba(232,160,32,.2)':'rgba(13,158,117,.2)', color: n.status==='warning'?'#f5bc50':'#4dd0a8' }}>
+                  <span style={{
+                    fontSize: 11, padding: '2px 8px', borderRadius: 99,
+                    background: n.status==='warning'?'rgba(232,160,32,.2)':'rgba(13,158,117,.2)',
+                    color: n.status==='warning'?'#f5bc50':'#4dd0a8'
+                  }}>
                     {n.status}
                   </span>
                 </div>
@@ -265,6 +285,7 @@ export default function Landing() {
           © 2025 MajiSmart Kenya. Solving the last-mile water access challenge.
         </p>
       </footer>
+
     </div>
   )
 }
