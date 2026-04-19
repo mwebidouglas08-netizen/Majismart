@@ -10,11 +10,15 @@ import Payments from './pages/Payments'
 import Alerts from './pages/Alerts'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
+import Users from './pages/Users'
+import Maintenance from './pages/Maintenance'
 import Layout from './components/Layout'
 
-function PrivateRoute({ children }) {
+function PrivateRoute({ children, roles }) {
   const { user } = useAuth()
-  return user ? children : <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/login" replace />
+  if (roles && !roles.includes(user.role)) return <Navigate to="/app/dashboard" replace />
+  return children
 }
 
 export default function App() {
@@ -27,13 +31,15 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/app" element={<PrivateRoute><Layout /></PrivateRoute>}>
             <Route index element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="nodes" element={<Nodes />} />
-            <Route path="nodes/:id" element={<NodeDetail />} />
-            <Route path="payments" element={<Payments />} />
-            <Route path="alerts" element={<Alerts />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="dashboard"   element={<Dashboard />} />
+            <Route path="nodes"       element={<Nodes />} />
+            <Route path="nodes/:id"   element={<NodeDetail />} />
+            <Route path="payments"    element={<Payments />} />
+            <Route path="alerts"      element={<Alerts />} />
+            <Route path="analytics"   element={<PrivateRoute roles={['admin','county_officer']}><Analytics /></PrivateRoute>} />
+            <Route path="users"       element={<PrivateRoute roles={['admin']}><Users /></PrivateRoute>} />
+            <Route path="maintenance" element={<PrivateRoute roles={['operator','admin']}><Maintenance /></PrivateRoute>} />
+            <Route path="settings"    element={<Settings />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
