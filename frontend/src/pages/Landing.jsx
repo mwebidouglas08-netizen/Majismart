@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Droplets, Wifi, CreditCard, Bell, BarChart3, Shield, ArrowRight, CheckCircle, MapPin, Zap } from 'lucide-react'
+import { Droplets, Wifi, CreditCard, Bell, BarChart3, ArrowRight, CheckCircle, MapPin, Zap } from 'lucide-react'
 
 export default function Landing() {
   return (
@@ -29,45 +29,45 @@ export default function Landing() {
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
 
-        {/* HD background — African mother carrying baby & water */}
+        {/* HD background — African community water crisis */}
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url('https://images.unsplash.com/photo-1594398901394-4e34939a4fd0?w=1920&q=95&auto=format&fit=crop')`,
+          backgroundImage: `url('https://images.unsplash.com/photo-1504297050568-910d24c426d3?w=1920&q=95&auto=format&fit=crop')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center 40%',
+          backgroundPosition: 'center 50%',
           backgroundRepeat: 'no-repeat',
         }} />
 
-        {/* Fallback if primary image fails to load */}
+        {/* Fallback image */}
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url('https://images.unsplash.com/photo-1612278675615-7b093b07772d?w=1920&q=95&auto=format&fit=crop')`,
+          backgroundImage: `url('https://images.unsplash.com/photo-1543996069-2a5ee9e9a6d4?w=1920&q=95&auto=format&fit=crop')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center 40%',
+          backgroundPosition: 'center 50%',
           backgroundRepeat: 'no-repeat',
           zIndex: -1,
         }} />
 
-        {/* Deep cinematic overlay — darker on left for text, lighter on right to reveal image */}
+        {/* Cinematic overlay — dark left for text, lighter right to show image */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(105deg, rgba(5,12,25,0.92) 0%, rgba(8,22,48,0.85) 35%, rgba(10,40,70,0.70) 60%, rgba(8,30,20,0.45) 100%)',
+          background: 'linear-gradient(105deg, rgba(5,12,25,0.93) 0%, rgba(8,22,50,0.87) 38%, rgba(10,42,72,0.72) 62%, rgba(6,28,18,0.48) 100%)',
         }} />
 
-        {/* Bottom fade into next section */}
+        {/* Bottom wave fade */}
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 200,
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 180,
           background: 'linear-gradient(to top, #f8f9fa 0%, transparent 100%)',
           zIndex: 3,
         }} />
 
-        {/* Animated ripple rings */}
+        {/* Ripple rings */}
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 1 }}>
           {[1,2,3,4].map(i => (
             <div key={i} style={{
               position: 'absolute',
               borderRadius: '50%',
-              border: '1px solid rgba(77,208,168,.25)',
+              border: '1px solid rgba(77,208,168,.22)',
               animation: `ripple ${3+i}s ease-out infinite`,
               animationDelay: `${i*0.7}s`,
               width: `${200+i*180}px`, height: `${200+i*180}px`,
@@ -87,32 +87,32 @@ export default function Landing() {
             50%    { transform:translateY(-12px); }
           }
           @keyframes fadeUp {
-            from{ opacity:0; transform:translateY(30px); }
+            from{ opacity:0; transform:translateY(32px); }
             to  { opacity:1; transform:translateY(0); }
           }
           @keyframes pulse {
             0%,100%{ opacity:1; }
-            50%    { opacity:.5; }
+            50%    { opacity:.45; }
           }
         `}</style>
 
         {/* Floating drop icons */}
         <div style={{ position: 'absolute', top: '18%', right: '7%', animation: 'float 4s ease-in-out infinite', zIndex: 2 }}>
-          <Droplets size={72} color="rgba(13,158,117,.4)" />
+          <Droplets size={72} color="rgba(13,158,117,.38)" />
         </div>
         <div style={{ position: 'absolute', bottom: '28%', right: '13%', animation: 'float 5s ease-in-out infinite .6s', zIndex: 2 }}>
-          <Droplets size={44} color="rgba(26,127,212,.4)" />
+          <Droplets size={44} color="rgba(26,127,212,.38)" />
         </div>
 
         {/* Hero content */}
-        <div style={{ position: 'relative', zIndex: 2, padding: '130px 44px 100px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
-          <div style={{ animation: 'fadeUp .9s ease forwards', maxWidth: 680 }}>
+        <div style={{ position: 'relative', zIndex: 2, padding: '130px 44px 110px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+          <div style={{ animation: 'fadeUp .9s ease forwards', maxWidth: 700 }}>
 
-            {/* Live indicator badge */}
+            {/* Live badge */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               background: 'rgba(13,158,117,.18)', border: '1px solid rgba(13,158,117,.45)',
-              borderRadius: 99, padding: '7px 16px', marginBottom: 28
+              borderRadius: 99, padding: '7px 16px', marginBottom: 30
             }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0d9e75', animation: 'pulse 1.8s ease-in-out infinite' }} />
               <span style={{ color: '#4dd0a8', fontSize: 13, fontWeight: 600, letterSpacing: .3 }}>
@@ -120,33 +120,34 @@ export default function Landing() {
               </span>
             </div>
 
-            {/* Main heading */}
+            {/* ── NEW TAGLINE ────────────────────────────────── */}
             <h1 style={{
-              fontSize: 'clamp(38px,6vw,72px)', fontWeight: 900,
-              color: 'white', lineHeight: 1.08, marginBottom: 10, letterSpacing: -1
+              fontSize: 'clamp(36px,5.5vw,68px)', fontWeight: 900,
+              color: 'white', lineHeight: 1.08, marginBottom: 12, letterSpacing: -1
             }}>
-              She Shouldn't Have
+              Turning Kenya's Water
             </h1>
             <h1 style={{
-              fontSize: 'clamp(38px,6vw,72px)', fontWeight: 900,
+              fontSize: 'clamp(36px,5.5vw,68px)', fontWeight: 900,
               lineHeight: 1.08, marginBottom: 28, letterSpacing: -1,
               background: 'linear-gradient(135deg,#4db8f4 0%,#4dd0a8 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
             }}>
-              Walk Miles for Water.
+              Crisis into Smart Access.
             </h1>
 
-            {/* Subheading */}
+            {/* ── NEW DESCRIPTION ───────────────────────────── */}
             <p style={{
               fontSize: 19, color: 'rgba(255,255,255,.78)',
-              maxWidth: 540, lineHeight: 1.8, marginBottom: 44
+              maxWidth: 580, lineHeight: 1.82, marginBottom: 44
             }}>
-              Millions of Kenyan mothers carry babies on their backs and water on their heads — every single day.
-              MajiSmart puts a smart water kiosk and M-Pesa tap in every community, so nobody walks that road again.
+              41% of Kenyans lack safe water. MajiSmart deploys solar-powered IoT sensors on boreholes and tanks,
+              lets communities pay via M-Pesa on any basic phone, and gives county officials
+              real-time data to manage every water point — ending shortages before they start.
             </p>
 
             {/* CTA buttons */}
-            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 64 }}>
+            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 60 }}>
               <Link to="/register" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 9,
                 background: 'linear-gradient(135deg,#1a7fd4,#0d9e75)',
@@ -173,18 +174,18 @@ export default function Landing() {
               </Link>
             </div>
 
-            {/* Impact stats */}
+            {/* Impact stats bar */}
             <div style={{
-              display: 'flex', gap: 0, flexWrap: 'wrap',
-              background: 'rgba(8,17,35,.55)', backdropFilter: 'blur(14px)',
-              border: '1px solid rgba(255,255,255,.09)',
-              borderRadius: 14, overflow: 'hidden', maxWidth: 620
+              display: 'flex', flexWrap: 'wrap',
+              background: 'rgba(8,17,35,.58)', backdropFilter: 'blur(14px)',
+              border: '1px solid rgba(255,255,255,.08)',
+              borderRadius: 14, overflow: 'hidden', maxWidth: 640
             }}>
               {[
-                { val: '41%',    label: 'Lack safe water',      color: '#f28b82' },
-                { val: 'Ksh 2',  label: 'Per 20L via M-Pesa',   color: '#4dd0a8' },
-                { val: '6 hrs',  label: 'Saved daily/family',   color: '#4db8f4' },
-                { val: '60%',    label: 'Less water wasted',    color: '#ffd54f' },
+                { val: '41%',   label: 'Lack safe water',    color: '#f28b82' },
+                { val: 'Ksh 2', label: 'Per 20L via M-Pesa', color: '#4dd0a8' },
+                { val: '6 hrs', label: 'Saved daily/family', color: '#4db8f4' },
+                { val: '60%',   label: 'Less water wasted',  color: '#ffd54f' },
               ].map((s, i) => (
                 <div key={s.val} style={{
                   flex: '1 1 140px', padding: '18px 20px',
@@ -200,7 +201,7 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Wave into next section */}
+        {/* Wave bottom */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 4 }}>
           <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
             <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f8f9fa"/>
@@ -216,7 +217,6 @@ export default function Landing() {
           <p style={{ color: '#5f6368', maxWidth: 560, margin: '0 auto 56px', lineHeight: 1.7 }}>
             MajiSmart connects physical water infrastructure to digital management — no complex setup required.
           </p>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 24 }}>
             {[
               { icon: Wifi,       color: '#1a7fd4', title: 'IoT Sensor Node',  desc: 'Solar-powered sensor reads water level, flow & turbidity every 15 minutes' },
@@ -278,10 +278,10 @@ export default function Landing() {
                 <span style={{ fontSize: 13, color: 'rgba(255,255,255,.6)' }}>Live Node Status</span>
               </div>
               {[
-                { name: 'Kiambu Borehole 1', level: 78, status: 'active',  county: 'Kiambu' },
+                { name: 'Kiambu Borehole 1', level: 78, status: 'active',  county: 'Kiambu'   },
                 { name: 'Machakos Tank A',   level: 45, status: 'active',  county: 'Machakos' },
-                { name: 'Kibera Kiosk',      level: 18, status: 'warning', county: 'Nairobi' },
-                { name: 'Nakuru Borehole 3', level: 91, status: 'active',  county: 'Nakuru' },
+                { name: 'Kibera Kiosk',      level: 18, status: 'warning', county: 'Nairobi'  },
+                { name: 'Nakuru Borehole 3', level: 91, status: 'active',  county: 'Nakuru'   },
               ].map(n => (
                 <div key={n.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,.06)' }}>
                   <MapPin size={14} color="rgba(255,255,255,.4)" />
