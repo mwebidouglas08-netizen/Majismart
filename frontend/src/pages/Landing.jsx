@@ -29,28 +29,45 @@ export default function Landing() {
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
 
-        {/* HD background image — African water scarcity scene */}
+        {/* HD background — African mother carrying baby & water */}
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url('https://images.unsplash.com/photo-1541544537156-7627a7a4aa1c?w=1920&q=90&auto=format&fit=crop')`,
+          backgroundImage: `url('https://images.unsplash.com/photo-1594398901394-4e34939a4fd0?w=1920&q=95&auto=format&fit=crop')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center 30%',
+          backgroundPosition: 'center 40%',
           backgroundRepeat: 'no-repeat',
         }} />
 
-        {/* Dark overlay so text stays readable */}
+        {/* Fallback if primary image fails to load */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, rgba(8,17,30,0.88) 0%, rgba(13,58,110,0.80) 45%, rgba(10,92,138,0.72) 70%, rgba(13,158,117,0.65) 100%)',
+          backgroundImage: `url('https://images.unsplash.com/photo-1612278675615-7b093b07772d?w=1920&q=95&auto=format&fit=crop')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 40%',
+          backgroundRepeat: 'no-repeat',
+          zIndex: -1,
         }} />
 
-        {/* Animated water ripple effect */}
-        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+        {/* Deep cinematic overlay — darker on left for text, lighter on right to reveal image */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(105deg, rgba(5,12,25,0.92) 0%, rgba(8,22,48,0.85) 35%, rgba(10,40,70,0.70) 60%, rgba(8,30,20,0.45) 100%)',
+        }} />
+
+        {/* Bottom fade into next section */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 200,
+          background: 'linear-gradient(to top, #f8f9fa 0%, transparent 100%)',
+          zIndex: 3,
+        }} />
+
+        {/* Animated ripple rings */}
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 1 }}>
           {[1,2,3,4].map(i => (
             <div key={i} style={{
               position: 'absolute',
               borderRadius: '50%',
-              border: '1px solid rgba(77,208,168,.30)',
+              border: '1px solid rgba(77,208,168,.25)',
               animation: `ripple ${3+i}s ease-out infinite`,
               animationDelay: `${i*0.7}s`,
               width: `${200+i*180}px`, height: `${200+i*180}px`,
@@ -61,72 +78,121 @@ export default function Landing() {
         </div>
 
         <style>{`
-          @keyframes ripple { 0%{opacity:.7;transform:translate(-50%,-50%) scale(0.8)} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)} }
-          @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-          @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+          @keyframes ripple {
+            0%  { opacity:.6; transform:translate(-50%,-50%) scale(0.8); }
+            100%{ opacity:0;  transform:translate(-50%,-50%) scale(1.7); }
+          }
+          @keyframes float {
+            0%,100%{ transform:translateY(0); }
+            50%    { transform:translateY(-12px); }
+          }
+          @keyframes fadeUp {
+            from{ opacity:0; transform:translateY(30px); }
+            to  { opacity:1; transform:translateY(0); }
+          }
+          @keyframes pulse {
+            0%,100%{ opacity:1; }
+            50%    { opacity:.5; }
+          }
         `}</style>
 
-        {/* Decorative water drops */}
-        <div style={{ position: 'absolute', top: '20%', right: '8%', animation: 'float 4s ease-in-out infinite' }}>
-          <Droplets size={80} color="rgba(13,158,117,.35)" />
+        {/* Floating drop icons */}
+        <div style={{ position: 'absolute', top: '18%', right: '7%', animation: 'float 4s ease-in-out infinite', zIndex: 2 }}>
+          <Droplets size={72} color="rgba(13,158,117,.4)" />
         </div>
-        <div style={{ position: 'absolute', bottom: '25%', right: '15%', animation: 'float 5s ease-in-out infinite .5s' }}>
-          <Droplets size={48} color="rgba(26,127,212,.35)" />
+        <div style={{ position: 'absolute', bottom: '28%', right: '13%', animation: 'float 5s ease-in-out infinite .6s', zIndex: 2 }}>
+          <Droplets size={44} color="rgba(26,127,212,.4)" />
         </div>
 
         {/* Hero content */}
-        <div style={{ position: 'relative', zIndex: 2, padding: '120px 40px 80px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
-          <div style={{ animation: 'fadeUp .8s ease forwards' }}>
+        <div style={{ position: 'relative', zIndex: 2, padding: '130px 44px 100px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+          <div style={{ animation: 'fadeUp .9s ease forwards', maxWidth: 680 }}>
 
-            {/* Live badge */}
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(13,158,117,.2)', border: '1px solid rgba(13,158,117,.4)', borderRadius: 99, padding: '6px 14px', marginBottom: 24 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0d9e75', animation: 'ripple 1.5s ease-out infinite' }} />
-              <span style={{ color: '#4dd0a8', fontSize: 13, fontWeight: 500 }}>Live — 6 Active Nodes Across Kenya</span>
+            {/* Live indicator badge */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'rgba(13,158,117,.18)', border: '1px solid rgba(13,158,117,.45)',
+              borderRadius: 99, padding: '7px 16px', marginBottom: 28
+            }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0d9e75', animation: 'pulse 1.8s ease-in-out infinite' }} />
+              <span style={{ color: '#4dd0a8', fontSize: 13, fontWeight: 600, letterSpacing: .3 }}>
+                Live — 6 Active Nodes Across Kenya
+              </span>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(36px,6vw,68px)', fontWeight: 800, color: 'white', lineHeight: 1.1, marginBottom: 24, maxWidth: 800 }}>
-              Smart Water<br />
-              <span style={{ background: 'linear-gradient(135deg,#4db8f4,#4dd0a8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                for Every Kenyan
-              </span>
+            {/* Main heading */}
+            <h1 style={{
+              fontSize: 'clamp(38px,6vw,72px)', fontWeight: 900,
+              color: 'white', lineHeight: 1.08, marginBottom: 10, letterSpacing: -1
+            }}>
+              She Shouldn't Have
+            </h1>
+            <h1 style={{
+              fontSize: 'clamp(38px,6vw,72px)', fontWeight: 900,
+              lineHeight: 1.08, marginBottom: 28, letterSpacing: -1,
+              background: 'linear-gradient(135deg,#4db8f4 0%,#4dd0a8 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+            }}>
+              Walk Miles for Water.
             </h1>
 
-            <p style={{ fontSize: 18, color: 'rgba(255,255,255,.75)', maxWidth: 560, lineHeight: 1.8, marginBottom: 40 }}>
-              IoT sensors monitor boreholes and tanks in real time. Communities pay via M-Pesa. County officials get live data. No cash. No waste. No guesswork.
+            {/* Subheading */}
+            <p style={{
+              fontSize: 19, color: 'rgba(255,255,255,.78)',
+              maxWidth: 540, lineHeight: 1.8, marginBottom: 44
+            }}>
+              Millions of Kenyan mothers carry babies on their backs and water on their heads — every single day.
+              MajiSmart puts a smart water kiosk and M-Pesa tap in every community, so nobody walks that road again.
             </p>
 
-            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+            {/* CTA buttons */}
+            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 64 }}>
               <Link to="/register" style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
+                display: 'inline-flex', alignItems: 'center', gap: 9,
                 background: 'linear-gradient(135deg,#1a7fd4,#0d9e75)',
-                color: 'white', padding: '14px 28px', borderRadius: 10,
-                fontWeight: 600, fontSize: 16, textDecoration: 'none',
-                boxShadow: '0 4px 24px rgba(26,127,212,.4)'
-              }}>
+                color: 'white', padding: '15px 30px', borderRadius: 10,
+                fontWeight: 700, fontSize: 16, textDecoration: 'none',
+                boxShadow: '0 6px 28px rgba(26,127,212,.45)',
+                transition: 'transform .2s, box-shadow .2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 10px 36px rgba(26,127,212,.55)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='0 6px 28px rgba(26,127,212,.45)' }}>
                 Launch Dashboard <ArrowRight size={18} />
               </Link>
               <Link to="/login" style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                background: 'rgba(255,255,255,.1)', backdropFilter: 'blur(8px)',
-                color: 'white', padding: '14px 28px', borderRadius: 10,
+                display: 'inline-flex', alignItems: 'center', gap: 9,
+                background: 'rgba(255,255,255,.10)', backdropFilter: 'blur(10px)',
+                color: 'white', padding: '15px 30px', borderRadius: 10,
                 fontWeight: 500, fontSize: 16, textDecoration: 'none',
-                border: '1px solid rgba(255,255,255,.2)'
-              }}>
+                border: '1px solid rgba(255,255,255,.22)',
+                transition: 'background .2s',
+              }}
+                onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,.18)'}
+                onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,.10)'}>
                 Sign In
               </Link>
             </div>
 
-            {/* Stats row */}
-            <div style={{ display: 'flex', gap: 40, marginTop: 64, flexWrap: 'wrap' }}>
+            {/* Impact stats */}
+            <div style={{
+              display: 'flex', gap: 0, flexWrap: 'wrap',
+              background: 'rgba(8,17,35,.55)', backdropFilter: 'blur(14px)',
+              border: '1px solid rgba(255,255,255,.09)',
+              borderRadius: 14, overflow: 'hidden', maxWidth: 620
+            }}>
               {[
-                { val: '41%',   label: 'Kenyans lack safe water' },
-                { val: 'Ksh 2', label: 'Per 20L via M-Pesa' },
-                { val: '6hrs',  label: 'Saved daily per family' },
-                { val: '60%',   label: 'Less water wastage' },
-              ].map(s => (
-                <div key={s.val}>
-                  <div style={{ fontSize: 28, fontWeight: 800, color: 'white' }}>{s.val}</div>
-                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,.5)', marginTop: 2 }}>{s.label}</div>
+                { val: '41%',    label: 'Lack safe water',      color: '#f28b82' },
+                { val: 'Ksh 2',  label: 'Per 20L via M-Pesa',   color: '#4dd0a8' },
+                { val: '6 hrs',  label: 'Saved daily/family',   color: '#4db8f4' },
+                { val: '60%',    label: 'Less water wasted',    color: '#ffd54f' },
+              ].map((s, i) => (
+                <div key={s.val} style={{
+                  flex: '1 1 140px', padding: '18px 20px',
+                  borderRight: i < 3 ? '1px solid rgba(255,255,255,.07)' : 'none',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.val}</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 5, lineHeight: 1.4 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -134,8 +200,8 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Wave bottom */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+        {/* Wave into next section */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 4 }}>
           <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
             <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f8f9fa"/>
           </svg>
@@ -153,11 +219,11 @@ export default function Landing() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 24 }}>
             {[
-              { icon: Wifi,       color: '#1a7fd4', title: 'IoT Sensor Node',   desc: 'Solar-powered sensor reads water level, flow & turbidity every 15 minutes' },
-              { icon: Zap,        color: '#0d9e75', title: '2G Transmission',   desc: 'Data sent over Safaricom/Airtel 2G — works anywhere in Kenya' },
-              { icon: CreditCard, color: '#e8a020', title: 'M-Pesa Payment',    desc: 'Dial USSD, confirm M-Pesa, solenoid valve opens for exact volume paid' },
-              { icon: Bell,       color: '#d93025', title: 'Smart Alerts',      desc: 'Instant SMS when tank is low, pump fails, or water quality drops' },
-              { icon: BarChart3,  color: '#6f42c1', title: 'County Dashboard',  desc: 'Live map, usage data, revenue reports for all county water points' },
+              { icon: Wifi,       color: '#1a7fd4', title: 'IoT Sensor Node',  desc: 'Solar-powered sensor reads water level, flow & turbidity every 15 minutes' },
+              { icon: Zap,        color: '#0d9e75', title: '2G Transmission',  desc: 'Data sent over Safaricom/Airtel 2G — works anywhere in Kenya' },
+              { icon: CreditCard, color: '#e8a020', title: 'M-Pesa Payment',   desc: 'Dial USSD, confirm M-Pesa, solenoid valve opens for exact volume paid' },
+              { icon: Bell,       color: '#d93025', title: 'Smart Alerts',     desc: 'Instant SMS when tank is low, pump fails, or water quality drops' },
+              { icon: BarChart3,  color: '#6f42c1', title: 'County Dashboard', desc: 'Live map, usage data, revenue reports for all county water points' },
             ].map((s, i) => (
               <div key={i} className="card" style={{ padding: 28, textAlign: 'left', transition: 'transform .2s,box-shadow .2s', cursor: 'default' }}
                 onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='0 8px 32px rgba(0,0,0,.13)' }}
