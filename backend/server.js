@@ -46,6 +46,7 @@ app.use('/api/payments',  require('./routes/payments'));
 app.use('/api/alerts',    require('./routes/alerts'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/users',     require('./routes/users'));
+app.use('/api/ai',        require('./routes/ai'));
 
 // ─── 404 for unknown routes ─────────────────────────────────────────────────────
 app.use((req, res) => {
