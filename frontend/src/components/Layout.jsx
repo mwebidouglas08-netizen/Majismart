@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Wifi, CreditCard, Bell, BarChart3,
-  Settings, LogOut, Menu, X, Droplets, Users, Wrench, Shield
+  Settings, LogOut, Menu, X, Droplets, Users, Wrench, Brain
 } from 'lucide-react'
 
 const NAV_BY_ROLE = {
@@ -12,6 +12,7 @@ const NAV_BY_ROLE = {
     { to: '/app/nodes',     icon: Wifi,            label: 'All Nodes' },
     { to: '/app/payments',  icon: CreditCard,       label: 'Payments' },
     { to: '/app/alerts',    icon: Bell,             label: 'Alerts' },
+    { to: '/app/ai-insights', icon: Brain,          label: 'AI Insights' },
     { to: '/app/analytics', icon: BarChart3,        label: 'Analytics' },
     { to: '/app/users',     icon: Users,            label: 'Users' },
     { to: '/app/settings',  icon: Settings,         label: 'Settings' },
@@ -21,6 +22,7 @@ const NAV_BY_ROLE = {
     { to: '/app/nodes',     icon: Wifi,            label: 'County Nodes' },
     { to: '/app/payments',  icon: CreditCard,       label: 'Revenue' },
     { to: '/app/alerts',    icon: Bell,             label: 'Alerts' },
+    { to: '/app/ai-insights', icon: Brain,          label: 'AI Insights' },
     { to: '/app/analytics', icon: BarChart3,        label: 'Analytics' },
     { to: '/app/settings',  icon: Settings,         label: 'Settings' },
   ],
@@ -29,6 +31,7 @@ const NAV_BY_ROLE = {
     { to: '/app/nodes',     icon: Wifi,            label: 'My Nodes' },
     { to: '/app/payments',  icon: CreditCard,       label: 'Payments' },
     { to: '/app/alerts',    icon: Bell,             label: 'Alerts' },
+    { to: '/app/ai-insights', icon: Brain,          label: 'AI Insights' },
     { to: '/app/maintenance', icon: Wrench,         label: 'Maintenance' },
     { to: '/app/settings',  icon: Settings,         label: 'Settings' },
   ],
@@ -37,6 +40,7 @@ const NAV_BY_ROLE = {
     { to: '/app/nodes',     icon: Wifi,            label: 'Water Points' },
     { to: '/app/payments',  icon: CreditCard,       label: 'Pay for Water' },
     { to: '/app/alerts',    icon: Bell,             label: 'Alerts' },
+    { to: '/app/ai-insights', icon: Brain,          label: 'AI Insights' },
   ],
 }
 
