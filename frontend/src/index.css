@@ -118,3 +118,36 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); }
 }
 .alert-bar-error { background: var(--red-light); color: #a52820; border: 1px solid #f5c6c3; }
 .alert-bar-success { background: var(--teal-light); color: #0a7a5c; border: 1px solid #9ee0c8; }
+
+/* ── Modernization additions ─────────────────────────────────────────── */
+
+.skeleton-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+}
+.skeleton-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+.fade-in { animation: fade-in .25s ease both; }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(.7); }
+}
+
+@media (max-width: 640px) {
+  main { padding: 16px 14px !important; }
+}
