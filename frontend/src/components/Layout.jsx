@@ -1,12 +1,11 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Wifi, CreditCard, Bell, BarChart3,
   Settings, LogOut, Menu, X, Droplets, Users, Wrench, Shield
 } from 'lucide-react'
 
-// Role-based navigation — each role sees only their relevant pages
 const NAV_BY_ROLE = {
   admin: [
     { to: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -48,14 +47,29 @@ const ROLE_COLOR = {
   community:      { bg: '#b5720a', badge: '#fef3d8', text: '#b5720a', label: 'Community Manager' },
 }
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== 'undefined' ? window.innerWidth >= 960 : true
+  )
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 960)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return isDesktop
+}
+
 export default function Layout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const [open, setOpen] = useState(false)
+  const isDesktop = useIsDesktop()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const role = user?.role || 'community'
   const nav = NAV_BY_ROLE[role] || NAV_BY_ROLE.community
   const rc = ROLE_COLOR[role] || ROLE_COLOR.community
+
+  const sidebarVisible = isDesktop || mobileOpen
 
   const handleLogout = () => { logout(); navigate('/') }
 
@@ -65,11 +79,10 @@ export default function Layout() {
       <aside style={{
         width: 240, background: '#0c1a2e', color: 'white',
         display: 'flex', flexDirection: 'column',
-        position: 'fixed', top: 0, left: open ? 0 : -240,
-        height: '100vh', zIndex: 100, transition: 'left .25s',
-        boxShadow: open ? '4px 0 20px rgba(0,0,0,.3)' : 'none'
+        position: 'fixed', top: 0, left: sidebarVisible ? 0 : -240,
+        height: '100vh', zIndex: 100, transition: 'left .25s ease',
+        boxShadow: !isDesktop && mobileOpen ? '4px 0 20px rgba(0,0,0,.3)' : 'none'
       }}>
-        {/* Logo */}
         <div style={{ padding: '24px 20px 16px', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
@@ -86,7 +99,6 @@ export default function Layout() {
           </div>
         </div>
 
-        {/* Role badge */}
         <div style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,.06)' }}>
           <span style={{
             fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 99,
@@ -96,10 +108,9 @@ export default function Layout() {
           </span>
         </div>
 
-        {/* Nav */}
         <nav style={{ flex: 1, padding: '12px 10px', overflowY: 'auto' }}>
           {nav.map(({ to, icon: Icon, label }) => (
-            <NavLink key={to} to={to} onClick={() => setOpen(false)}
+            <NavLink key={to} to={to} onClick={() => setMobileOpen(false)}
               style={({ isActive }) => ({
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '10px 12px', borderRadius: 8, marginBottom: 2,
@@ -115,7 +126,6 @@ export default function Layout() {
           ))}
         </nav>
 
-        {/* User info */}
         <div style={{ padding: '16px 12px', borderTop: '1px solid rgba(255,255,255,.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
             <div style={{
@@ -145,24 +155,30 @@ export default function Layout() {
         </div>
       </aside>
 
-      {open && <div onClick={() => setOpen(false)}
-        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 99 }} />}
+      {!isDesktop && mobileOpen && (
+        <div onClick={() => setMobileOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 99 }} />
+      )}
 
       {/* Main area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* Topbar */}
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0,
+        marginLeft: isDesktop ? 240 : 0, transition: 'margin-left .25s ease'
+      }}>
         <header style={{
           background: 'white', borderBottom: '1px solid var(--gray-200)',
           padding: '0 20px', height: 58, display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50,
           boxShadow: '0 1px 4px rgba(0,0,0,.06)'
         }}>
-          <button onClick={() => setOpen(!open)} style={{
-            background: 'none', border: 'none', padding: 6,
-            borderRadius: 6, color: 'var(--gray-600)', cursor: 'pointer'
-          }}>
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          {!isDesktop ? (
+            <button onClick={() => setMobileOpen(!mobileOpen)} style={{
+              background: 'none', border: 'none', padding: 6,
+              borderRadius: 6, color: 'var(--gray-600)', cursor: 'pointer'
+            }}>
+              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          ) : <div />}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{
               fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99,
