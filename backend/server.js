@@ -24,7 +24,16 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// ─── Health check FIRST — before DB, before anything ──────────────────────────
+// ─── Root route — confirms the API is alive ────────────────────────────────────
+app.get('/', (req, res) => {
+  res.status(200).json({
+    service: 'MajiSmart API',
+    status: 'running',
+    health: '/api/health'
+  });
+});
+
+// ─── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', version: '1.0.0', time: new Date().toISOString() });
 });
@@ -38,7 +47,7 @@ app.use('/api/alerts',    require('./routes/alerts'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/users',     require('./routes/users'));
 
-// ─── 404 for unknown API routes ────────────────────────────────────────────────
+// ─── 404 for unknown routes ─────────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
