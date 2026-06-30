@@ -12,6 +12,7 @@ import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
 import Users from './pages/Users'
 import Maintenance from './pages/Maintenance'
+import AIInsights from './pages/AIInsights'
 import Layout from './components/Layout'
 
 function PrivateRoute({ children, roles }) {
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="nodes/:id"   element={<NodeDetail />} />
             <Route path="payments"    element={<Payments />} />
             <Route path="alerts"      element={<Alerts />} />
+            <Route path="ai-insights" element={<AIInsights />} />
             <Route path="analytics"   element={<PrivateRoute roles={['admin','county_officer']}><Analytics /></PrivateRoute>} />
             <Route path="users"       element={<PrivateRoute roles={['admin']}><Users /></PrivateRoute>} />
             <Route path="maintenance" element={<PrivateRoute roles={['operator','admin']}><Maintenance /></PrivateRoute>} />
